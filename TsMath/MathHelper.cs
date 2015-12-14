@@ -1,9 +1,15 @@
-﻿using System;
+﻿#region License
+/*
+Copyright (c) Thomas Steinfeld 2015. All rights reserved.
+For detailed licensing information see LICENSE in the root folder.
+*/
+#endregion
+using System;
 
 namespace TsMath
 {
 	/// <summary>
-	/// Helper functions.
+	/// Math helper functions and extension.
 	/// </summary>
 	public static class MathHelper
 	{
