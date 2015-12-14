@@ -11,7 +11,7 @@ namespace TsMath
 	/// <summary>
 	/// Math helper functions and extension.
 	/// </summary>
-	public static class MathHelper
+	public static class MathExtensions
 	{
 
 		/// <summary>
@@ -19,7 +19,7 @@ namespace TsMath
 		/// </summary>
 		static int MSW;
 
-		static MathHelper()
+		static MathExtensions()
 		{
 			MSW = BitConverter.IsLittleEndian ? 3 : 0;
 		}
@@ -50,7 +50,7 @@ namespace TsMath
 		/// </summary>
 		/// <param name="x">The number.</param>
 		/// <returns>The square (<paramref name="x"/>*<paramref name="x"/>).</returns>
-		public static double Sqr(double x)
+		public static double Sqr(this double x)
 		{
 			return x * x;
 		}
@@ -60,7 +60,7 @@ namespace TsMath
 		/// </summary>
 		/// <param name="x">The number whose logarithm is to be found.</param>
 		/// <returns>The logarithm.</returns>
-		public static double Log2(double x)
+		public static double Log2(this double x)
 		{
 			return Math.Log(x, 2);
 		}
@@ -75,46 +75,7 @@ namespace TsMath
 			return !double.IsNaN(x) && !double.IsInfinity(x);
 		}
 
-		///// <summary>
-		///// Calculates the unit in the last place of a double number.
-		///// </summary>
-		///// <remarks>
-		///// This code is adapted from Abrams: Efficient and Reliable Methods for Rounded Interval Arithmetic. 
-		///// It depends on, that the number is internally represented according to the IEEE-754 standard. 
-		///// </remarks>
-		///// <param name="x">The number.</param>
-		///// <returns>The unit in the last place.</returns>
-		//public static unsafe double UnitLastPlaceUnsafe(this double x)
-		//{
-		//	if (x == 0)
-		//		return 0;
-		//	double X = x;
-		//	double U = 0;
-		//	ushort* xsh = (ushort*)&X;
-		//	ushort* ush = (ushort*)&U;
-		//	xsh[MSW] &= 0x7ff0;         //isolate exponent in 16-bit word
-		//															//check if the number is normalized
-		//	if (xsh[MSW] > 0x340)
-		//		//set exponent to e-52;  the value 0x0340 is 52 left-shifted 4 bits, i.e. 0x0340 = 832 = 52<<4
-		//		ush[MSW] = (ushort)(xsh[MSW] - (ushort)0x0340);
-		//	else
-		//	{
-		//		//biased exponent - 1
-		//		int e1 = (xsh[MSW] >> 4) - 1;
-		//		//find 16-bit word containing bit e-1
-		//		int word = e1 >> 4;
-		//		//compensate for word ordering
-		//		if (MSW == 0)
-		//			word = 3 - word;
-		//		//find the bit position in this word
-		//		int bit = e1 % 16;
-		//		int mask = 1 << bit;
-		//		//set the bit to 1
-		//		ush[word] |= (ushort)mask;
-		//	}
-		//	return U;
-		//}
-
+	
 		/// <summary>
 		/// Calculates the unit in the last place of a double number.
 		/// </summary>
