@@ -56,11 +56,11 @@ namespace TsMath
 				return Interval.Empty;
 			if (a.IsNumber)
 				return new Interval(Math.Abs(a.A), true);
-			if (a.A < 0 && a.B > 0)
-				return new Interval(0, Math.Max(-a.A, a.B));
-
 			double lower = Math.Abs(a.A);
 			double upper = Math.Abs(a.B);
+			if (a.A < 0 && a.B > 0)
+				return new Interval(0, Math.Max(lower, upper));
+
 			if (lower > upper)
 			{
 				double tmp = lower; lower = upper; upper = tmp;
