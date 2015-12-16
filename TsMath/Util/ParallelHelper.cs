@@ -1,4 +1,10 @@
-﻿using System;
+#region License
+/*
+Copyright (c) Thomas Steinfeld 2015. All rights reserved.
+For detailed licensing information see LICENSE in the root folder.
+*/
+#endregion
+using System;
 using System.Threading.Tasks;
 
 namespace TsMath.Util
