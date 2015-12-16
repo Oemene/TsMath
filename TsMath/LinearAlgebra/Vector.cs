@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Copyright (c) Thomas Steinfeld 2015. All rights reserved.
 For detailed licensing information see LICENSE in the root folder.
@@ -31,9 +31,9 @@ namespace TsMath.LinearAlgebra
 		public Interval Norm2 => this * this;
 
 		/// <summary>
-		/// Returns the length (norm) of this vector.
+		/// Returns the norm (length) of this vector.
 		/// </summary>
-		public Interval Length => Norm2.Sqrt();
+		public Interval Norm => Norm2.Sqrt();
 
 		/// <summary>
 		/// Returns an element at a given position.

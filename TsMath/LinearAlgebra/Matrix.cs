@@ -1,29 +1,28 @@
-#region License
+﻿#region License
 /*
 Copyright (c) Thomas Steinfeld 2015. All rights reserved.
 For detailed licensing information see LICENSE in the root folder.
 */
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using TsMath.Util;
 
 namespace TsMath.LinearAlgebra
 {
 	/// <summary>
-	/// Dense matrix (array m x n) with HybridDouble values for matrix algebra.
+	/// Dense matrix (array m x n) with <see cref="Interval"/> values for matrix algebra.
 	/// </summary>
 	public class Matrix
 	{
 
+		#region Values
 		Interval[,] elements;
 
-		int nRows, nCols;
+		int nRows, nColumns;
 
+		#endregion
 
 		#region Constructors
 		/// <summary>
@@ -34,7 +33,7 @@ namespace TsMath.LinearAlgebra
 		public Matrix(int nRows, int nColumns)
 		{
 			this.nRows = nRows;
-			this.nCols = nColumns;
+			this.nColumns = nColumns;
 			elements = new Interval[nRows, nColumns];
 		}
 
@@ -47,7 +46,7 @@ namespace TsMath.LinearAlgebra
 		{
 			this.elements = data;
 			nRows = data.GetLength(0);
-			nCols = data.GetLength(1);
+			nColumns = data.GetLength(1);
 		}
 
 		/// <summary>
@@ -58,11 +57,11 @@ namespace TsMath.LinearAlgebra
 		public Matrix(double[,] data, bool asNumber = false)
 		{
 			nRows = data.GetLength(0);
-			nCols = data.GetLength(1);
-			elements = new Interval[nRows, nCols];
+			nColumns = data.GetLength(1);
+			elements = new Interval[nRows, nColumns];
 			for (int i = 0; i < nRows; i++)
 			{
-				for (int j = 0; j < nCols; j++)
+				for (int j = 0; j < nColumns; j++)
 				{
 					elements[i, j] = new Interval(data[i, j], asNumber);
 				}
@@ -78,8 +77,8 @@ namespace TsMath.LinearAlgebra
 		{
 			if (fColumn)
 			{
-				nRows = vals.Length; nCols = 1;
-				elements = new Interval[nRows, nCols];
+				nRows = vals.Length; nColumns = 1;
+				elements = new Interval[nRows, nColumns];
 				for (int i = 0; i < vals.Length; i++)
 				{
 					elements[i, 0] = vals[i];
@@ -87,8 +86,8 @@ namespace TsMath.LinearAlgebra
 			}
 			else
 			{
-				nCols = vals.Length; nRows = 1;
-				elements = new Interval[nRows, nCols];
+				nColumns = vals.Length; nRows = 1;
+				elements = new Interval[nRows, nColumns];
 				for (int i = 0; i < vals.Length; i++)
 				{
 					elements[0, i] = vals[i];
@@ -129,7 +128,7 @@ namespace TsMath.LinearAlgebra
 		/// </summary>
 		public int ColumnCount
 		{
-			get { return nCols; }
+			get { return nColumns; }
 		}
 
 		/// <summary>
@@ -139,7 +138,7 @@ namespace TsMath.LinearAlgebra
 		/// <param name="elements">Array to receive the elements.</param>
 		public void FillRow(int row, Interval[] elements)
 		{
-			for (int i = 0; i < nCols; i++)
+			for (int i = 0; i < nColumns; i++)
 			{
 				elements[i] = this.elements[row, i];
 			}
@@ -177,7 +176,7 @@ namespace TsMath.LinearAlgebra
 		/// <returns>Vector which contains the contents of the row.</returns>
 		public Vector GetRow(int row)
 		{
-			Interval[] hd = new Interval[nCols];
+			Interval[] hd = new Interval[nColumns];
 			FillRow(row, hd);
 			return new Vector(hd);
 		}
@@ -189,7 +188,7 @@ namespace TsMath.LinearAlgebra
 		/// <param name="elements">Array where the elements come from.</param>
 		public void SetRow(int row, Interval[] elements)
 		{
-			for (int i = 0; i < nCols; i++)
+			for (int i = 0; i < nColumns; i++)
 			{
 				this.elements[row, i] = elements[i];
 			}
@@ -215,7 +214,7 @@ namespace TsMath.LinearAlgebra
 		/// <param name="row2">Second row index.</param>
 		public void SwapRows(int row1, int row2)
 		{
-			for (int i = 0; i < nCols; i++)
+			for (int i = 0; i < nColumns; i++)
 			{
 				var tmp = elements[row1, i];
 				elements[row1, i] = elements[row2, i];
@@ -246,7 +245,7 @@ namespace TsMath.LinearAlgebra
 		{
 			ParallelHelper.For(0, nRows, i =>
 			{
-				for (int j = 0; j < nCols; j++)
+				for (int j = 0; j < nColumns; j++)
 				{
 					this.elements[i, j] = op(i, j);
 				}
@@ -259,10 +258,10 @@ namespace TsMath.LinearAlgebra
 		/// </summary>
 		/// <param name="fParallel">Indicates whether the copy should be carried out in parallel.</param>
 		/// <returns>The copy.</returns>
-		public Matrix Copy(bool fParallel = false)
+		public Matrix Copy()
 		{
 			var m = new Matrix(this.RowCount, this.ColumnCount);
-			m.SetElementwise((row, column) => this[row, column], nRows * nCols);
+			m.SetElementwise((row, column) => this[row, column], nRows * nColumns);
 			return m;
 		}
 
@@ -320,8 +319,8 @@ namespace TsMath.LinearAlgebra
 		/// <returns>The transposed matrix.</returns>
 		public Matrix Transpose(bool fParallel = false)
 		{
-			Matrix c = new Matrix(nCols, nRows);
-			c.SetElementwise((row, column) => this[column, row], nRows * nCols);
+			Matrix c = new Matrix(nColumns, nRows);
+			c.SetElementwise((row, column) => this[column, row], nRows * nColumns);
 			return c;
 		}
 
@@ -335,7 +334,7 @@ namespace TsMath.LinearAlgebra
 		public static Matrix operator *(Interval scalar, Matrix a)
 		{
 			Matrix c = new Matrix(a.RowCount, a.ColumnCount);
-			c.SetElementwise((row, column) => scalar * a[row, column], a.nRows * a.nCols);
+			c.SetElementwise((row, column) => scalar * a[row, column], a.nRows * a.nColumns);
 			return c;
 		}
 
@@ -423,8 +422,8 @@ namespace TsMath.LinearAlgebra
 		/// <returns>The result matrix.</returns>
 		public static Matrix operator +(Matrix a, Matrix b)
 		{
-			int aRows = a.nRows, aCols = a.nCols;
-			if (b.nRows != aRows || b.nCols != aCols)
+			int aRows = a.nRows, aCols = a.nColumns;
+			if (b.nRows != aRows || b.nColumns != aCols)
 				throw new ArgumentException("Matrix size mismatch.");
 			Matrix c = new Matrix(aRows, aCols);
 			c.SetElementwise((row, column) => a[row, column] + b[row, column], aRows * aCols);
@@ -439,8 +438,8 @@ namespace TsMath.LinearAlgebra
 		/// <returns>The result matrix.</returns>
 		public static Matrix operator -(Matrix a, Matrix b)
 		{
-			int aRows = a.nRows, aCols = a.nCols;
-			if (b.nRows != aRows || b.nCols != aCols)
+			int aRows = a.nRows, aCols = a.nColumns;
+			if (b.nRows != aRows || b.nColumns != aCols)
 				throw new ArgumentException("Matrix size mismatch.");
 			Matrix c = new Matrix(aRows, aCols);
 			c.SetElementwise((row, column) => a[row, column] - b[row, column], aRows * aCols);
@@ -455,7 +454,7 @@ namespace TsMath.LinearAlgebra
 		public static Matrix operator -(Matrix a)
 		{
 			Matrix c = new Matrix(a.RowCount, a.ColumnCount);
-			c.SetElementwise((row, column) => -a[row, column], a.nRows * a.nCols);
+			c.SetElementwise((row, column) => -a[row, column], a.nRows * a.nColumns);
 			return c;
 		}
 
@@ -476,7 +475,7 @@ namespace TsMath.LinearAlgebra
 		public override string ToString()
 		{
 			int nr = Math.Min(nRows, 5);
-			int ncol = Math.Min(nCols, 5);
+			int ncol = Math.Min(nColumns, 5);
 			StringBuilder sb = new StringBuilder();
 
 			for (int i = 0; i < nr; i++)
@@ -491,7 +490,7 @@ namespace TsMath.LinearAlgebra
 						sb.Append(", ");
 					sb.AppendFormat(elements[i, j].ToString());
 				}
-				if (ncol < nCols)
+				if (ncol < nColumns)
 					sb.Append(",...");
 				sb.Append(fRand ? ')' : '|');
 			}
@@ -518,7 +517,7 @@ namespace TsMath.LinearAlgebra
 					{
 						Interval sumj = Interval.Zero;
 
-						for (int j = 0; j < nCols; j++)
+						for (int j = 0; j < nColumns; j++)
 						{
 							var el = elements[i, j];
 							sumj += el * el;
@@ -535,7 +534,7 @@ namespace TsMath.LinearAlgebra
 								lck.Exit();
 						}
 
-					}, nRows * nCols);
+					}, nRows * nColumns);
 				return sum;
 			}
 		}

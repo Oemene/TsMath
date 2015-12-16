@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 /*
 Copyright (c) Thomas Steinfeld 2015. All rights reserved.
 For detailed licensing information see LICENSE in the root folder.
@@ -23,6 +23,14 @@ namespace TsMath.Util
 		/// </summary>
 		public static bool EnableParallel = true;
 
+		/// <summary>
+		/// For loop with switches to multi-threaded variant depending of <paramref name="complexity"/>.
+		/// </summary>
+		/// <param name="fromInclusive">The start index, inclusive.</param>
+		/// <param name="toExclusive">The end index, exclusive.</param>
+		/// <param name="action">The action to be performed for every index.</param>
+		/// <param name="complexity">The complexity. If this values is at least <see cref="Global.ParallelThreshold"/>
+		/// than the for loop will be executed in parallel using <see cref="Parallel.For(int, int, Action{int})"/>.</param>
 		public static void For(int fromInclusive, int toExclusive, Action<int> action, int complexity)
 		{
 			if (complexity >= Global.ParallelThreshold)
