@@ -117,7 +117,6 @@ namespace TsMath
 		/// <returns>True, if this interval contains <paramref name="d"/>; false otherwise.</returns>
 		public bool Contains(double d) => a <= d && d <= b;
 
-
 		/// <summary>
 		/// Returns true if this interval contains 0.
 		/// </summary>
@@ -127,7 +126,7 @@ namespace TsMath
 		/// Checks if this interval contains an other interval.
 		/// </summary>
 		/// <param name="a">Other interval.</param>
-		/// <returns><b>true</b>, if this interval contains the interval <paramref name="a"/>; false otherwise.</returns>
+		/// <returns><b>true</b>, if this interval contains the interval <paramref name="a"/>; <b>false</b> otherwise.</returns>
 		public bool Contains(Interval a) => Contains(a.a) && Contains(a.b);
 
 		/// <summary>
@@ -162,7 +161,7 @@ namespace TsMath
 		}
 
 		/// <summary>
-		/// Calculates the union of two intervals.
+		/// Calculates the union of two intervals (the smallest interval which contains both intervals).
 		/// </summary>
 		/// <param name="a">First interval.</param>
 		/// <param name="b">Second interval.</param>
@@ -212,7 +211,6 @@ namespace TsMath
 
 		#region Arithmetic operations
 
-
 		static internal Interval CreateWithUlp(double a, double b)
 		{
 			a -= a.UnitLastPlace();
@@ -242,7 +240,8 @@ namespace TsMath
 		/// Subtracts two intervals.
 		/// </summary>
 		/// <remarks>
-		/// This operation is rounded. It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
+		/// This operation is rounded if not both operands are numbers. 
+		/// It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
 		/// </remarks>
 		/// <param name="a">First interval.</param>
 		/// <param name="b">Second interval.</param>
@@ -269,11 +268,11 @@ namespace TsMath
 		/// <summary>
 		/// Calculates the minimum of 4 numbers.
 		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <param name="c"></param>
-		/// <param name="d"></param>
-		/// <returns></returns>
+		/// <param name="a">First number.</param>
+		/// <param name="b">Second number.</param>
+		/// <param name="c">Third number.</param>
+		/// <param name="d">Forth number.</param>
+		/// <returns>The minimum of 4 numbers.</returns>
 		static double Min4(double a, double b, double c, double d)
 		{
 			double m = a < b ? a : b;
@@ -287,11 +286,11 @@ namespace TsMath
 		/// <summary>
 		/// Calculates the maximum of 4 numbers.
 		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <param name="c"></param>
-		/// <param name="d"></param>
-		/// <returns></returns>
+		/// <param name="a">First number.</param>
+		/// <param name="b">Second number.</param>
+		/// <param name="c">Third number.</param>
+		/// <param name="d">Forth number.</param>
+		/// <returns>The maximum of 4 numbers.</returns>
 		static double Max4(double a, double b, double c, double d)
 		{
 			double m = a > b ? a : b;
@@ -306,7 +305,8 @@ namespace TsMath
 		/// Multiplies two intervals.
 		/// </summary>
 		/// <remarks>
-		/// This operation is rounded. It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
+		/// This operation is rounded if not both operands are numbers. 
+		/// It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
 		/// </remarks>
 		/// <param name="a">First interval.</param>
 		/// <param name="b">Second interval.</param>
@@ -325,17 +325,25 @@ namespace TsMath
 		/// Divides two intervals.
 		/// </summary>
 		/// <remarks>
-		/// This operation is rounded. It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
+		/// This operation is rounded if not both operands are numbers. 
+		/// It will expand the endpoints of the result with <see cref="MathExtensions.UnitLastPlace(double)"/>.
+		/// <para>
+		/// If <paramref name="b"/> contains 0, the result is [-∞,∞]; if <paramref name="a"/> and <paramref name="b"/>
+		/// contain 0, the result is <see cref="Empty"/>.
+		/// </para>
 		/// </remarks>
 		/// <param name="a">First interval.</param>
 		/// <param name="b">Second interval.</param>
-		/// <returns>Division of both intervals. If <paramref name="b"/> contains 0, the result is [-∞,∞]</returns>
+		/// <returns>Quotient of both intervals. </returns>
 		public static Interval operator /(Interval a, Interval b)
 		{
 			if (a.IsEmpty || b.IsEmpty)
 				return Empty;
 			if (b.ContainsZero)
-				return new Interval(double.NegativeInfinity, double.PositiveInfinity);
+				if (a.ContainsZero)
+					return Interval.Empty;	 // 0/0
+				else
+					return new Interval(double.NegativeInfinity, double.PositiveInfinity);
 			if (a.IsNumber && b.IsNumber)
 				return new Interval(a.a / b.a, true);
 
