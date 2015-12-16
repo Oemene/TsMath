@@ -1,11 +1,17 @@
-﻿using System;
+﻿#region License
+/*
+Copyright (c) Thomas Steinfeld 2015. All rights reserved.
+For detailed licensing information see LICENSE in the root folder.
+*/
+#endregion
+using System;
 
 namespace TsMath
 {
 	/// <summary>
 	/// Routines for higher level interval functions.
 	/// </summary>
-	public static class IntervalExtensions
+	public static class IntervalMath
 	{
 		/// <summary>
 		/// Computes the square root of an interval.
@@ -23,6 +29,11 @@ namespace TsMath
 			return Interval.CreateWithUlp(lower, upper);
 		}
 
+		/// <summary>
+		/// Calculates the power of <b>e</b> raised to <paramref name="a"/>.
+		/// </summary>
+		/// <param name="a">The exponent.</param>
+		/// <returns><b>e</b>^<paramref name="a"/></returns>
 		public static Interval Exp(this Interval a)
 		{
 			if (a.IsEmpty)
